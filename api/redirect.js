@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
         const shortCode = req.url.split('/').pop();
         
         if (shortCode.length < 3) {
-            return res.redirect(302, '/activate');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.redirect(302, '/activate');
         }
 
         const { data, error } = await supabase
@@ -19,11 +20,13 @@ module.exports = async (req, res) => {
             .limit(1);
 
         if (error) {
-            return res.redirect(302, '/activate');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.redirect(302, '/activate');
         }
 
         if (data.length === 0) {
-            return res.redirect(302, '/activate');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.redirect(302, '/activate');
         }
 
         const link = data[0];
@@ -36,10 +39,11 @@ module.exports = async (req, res) => {
         } catch (updateError) {
             console.log('Update failed');
         }
-
+        res.setHeader('Access-Control-Allow-Origin', '*');
         return res.redirect(301, link.destination_url);
 
     } catch (error) {
-        return res.redirect(302, '/activate');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.redirect(302, '/activate');
     }
 };

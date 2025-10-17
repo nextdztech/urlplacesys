@@ -13,12 +13,12 @@ module.exports = async (req, res) => {
     };
 
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).end();    }
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(405).json({ error: 'Method not allowed' });    }
 
     try {
         // تاريخ 6 أشهر مضت
@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
             .select();
 
         if (error) {
-            return res.status(500).json({ error: 'Database error' });
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Database error' });
         }
 
         // تنظيف محاولات العملاء القديمة
@@ -47,13 +47,14 @@ module.exports = async (req, res) => {
             .delete()
             .lt('reset_time', oneDayAgo.toISOString());
 
-        return res.status(200).json({
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json({
     success: true,
     deletedCount: deletedLinks ? deletedLinks.length : 0
 });
 
     } catch (error) {
         console.error('Cleanup API Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Internal server error' });    }
 };

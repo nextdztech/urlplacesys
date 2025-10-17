@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
     };
 
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).end();    }
 
     try {
         const method = req.method;
@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
                 .order('created_at', { ascending: false });
 
             if (linksError) {
-                return res.status(500).json({ error: 'Database error' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Database error' });            }
 
             // حساب الإحصائيات
             const now = new Date();
@@ -48,8 +48,8 @@ module.exports = async (req, res) => {
                 activeLinks: links.filter(link => (link.visit_count || 0) > 0).length
             };
 
-            return res.status(200).json({ links, stats });
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json({ links, stats });
         }
 
         // POST: إنشاء رابط جديد
@@ -58,14 +58,14 @@ module.exports = async (req, res) => {
 
             // التحقق من البيانات
             if (!validateCode(shortCode)) {
-                return res.status(400).json({ error: 'Invalid short code' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Invalid short code' });            }
 
             try {
                 new URL(destinationUrl);
             } catch {
-                return res.status(400).json({ error: 'Invalid URL' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Invalid URL' });
             }
 
             // التحقق من وجود الكود
@@ -76,8 +76,8 @@ module.exports = async (req, res) => {
                 .single();
 
             if (existing) {
-                return res.status(400).json({ error: 'Short code already exists' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Short code already exists' });
             }
 
             // إنشاء الرابط
@@ -90,32 +90,32 @@ module.exports = async (req, res) => {
                 });
 
             if (error) {
-                return res.status(500).json({ error: 'Database error' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Database error' });            }
 
-            return res.status(201).json({ success: true });
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(201).json({ success: true });
         }
 
         // PUT: تحديث رابط موجود
         if (method === 'PUT') {
             if (!id) {
-                return res.status(400).json({ error: 'Link ID required' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Link ID required' });
             }
 
             const { shortCode, destinationUrl } = JSON.parse(req.body);
 
             // التحقق من البيانات
             if (!validateCode(shortCode)) {
-                return res.status(400).json({ error: 'Invalid short code' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Invalid short code' });            }
 
             try {
                 new URL(destinationUrl);
             } catch {
-                return res.status(400).json({ error: 'Invalid URL' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Invalid URL' });
             }
 
             // التحقق من تفرد الكود (إلا إذا كان نفس الرابط)
@@ -127,8 +127,8 @@ module.exports = async (req, res) => {
                 .single();
 
             if (existing) {
-                return res.status(400).json({ error: 'Short code already exists' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Short code already exists' });
             }
 
             // تحديث الرابط
@@ -142,17 +142,17 @@ module.exports = async (req, res) => {
                 .eq('id', id);
 
             if (error) {
-                return res.status(500).json({ error: 'Database error' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                return res.status(500).json({ error: 'Database error' });            }
 
-            return res.status(200).json({ success: true });
-        }
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json({ success: true });        }
 
         // DELETE: حذف رابط
         if (method === 'DELETE') {
             if (!id) {
-                return res.status(400).json({ error: 'Link ID required' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Link ID required' });
             }
 
             const { error } = await supabase
@@ -161,16 +161,16 @@ module.exports = async (req, res) => {
                 .eq('id', id);
 
             if (error) {
-                return res.status(500).json({ error: 'Database error' });
-            }
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                return res.status(500).json({ error: 'Database error' });            }
 
-            return res.status(200).json({ success: true });
-        }
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json({ success: true });        }
 
-        return res.status(405).json({ error: 'Method not allowed' });
-
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
         console.error('Admin Links API Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Internal server error' });    }
 };

@@ -55,21 +55,21 @@ module.exports = async (req, res) => {
 
     // معالجة طلبات OPTIONS
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).end();    }
 
     if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(405).json({ error: 'Method not allowed' });    }
 
     try {
         const ip = getClientIP(event);
         const attemptsInfo = await getCustomerAttempts(ip);
 
-        return res.status(200).json(attemptsInfo);
-
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json(attemptsInfo);
     } catch (error) {
         console.error('Attempts API Error:', error);
-        return res.status(500).json({ error: 'Internal server error', remaining: 10 });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Internal server error', remaining: 10 });    }
 };

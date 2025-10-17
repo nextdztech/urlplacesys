@@ -85,8 +85,8 @@ module.exports = async (req, res) => {
 
     // معالجة طلبات OPTIONS
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).end();    }
 
     try {
         const ip = getClientIP(event);
@@ -98,8 +98,8 @@ module.exports = async (req, res) => {
             const shortCode = path.substring(1); // إزالة الـ /
 
             if (!shortCode) {
-                return res.status(400).json({ error: 'Short code required' });
-
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ error: 'Short code required' });
             }
 
             // البحث عن الرابط
@@ -110,7 +110,8 @@ module.exports = async (req, res) => {
                 .single();
 
             if (error || !link) {
-                return res.status(404).json({ error: 'Link not found' });
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(404).json({ error: 'Link not found' });
 
             }
 
@@ -121,7 +122,8 @@ module.exports = async (req, res) => {
                 .eq('id', link.id);
 
             // إعادة توجيه
-               return res.redirect(302, '/activate');
+               res.setHeader('Access-Control-Allow-Origin', '*');
+return res.redirect(302, '/activate');
 
 
 
@@ -132,7 +134,8 @@ module.exports = async (req, res) => {
             // التحقق من المحاولات
             const attemptCheck = await checkCustomerAttempts(ip);
             if (!attemptCheck.allowed) {
-                return res.status(429).json({ 
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(429).json({ 
     error: 'Too many attempts',
     remaining: attemptCheck.remaining
 });
@@ -142,7 +145,8 @@ module.exports = async (req, res) => {
 
             // التحقق من البيانات
             if (!validateCode(shortCode)) {
-                return res.status(400).json({ 
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ 
     error: 'Invalid short code',
     remaining: attemptCheck.remaining
 });
@@ -151,7 +155,8 @@ module.exports = async (req, res) => {
             try {
                 new URL(destinationUrl);
             } catch {
-                return res.status(400).json({ 
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(400).json({ 
     error: 'Invalid URL',
     remaining: attemptCheck.remaining
 });
@@ -175,13 +180,15 @@ module.exports = async (req, res) => {
                     .eq('short_code', shortCode);
 
                 if (error) {
-                    return res.status(500).json({ 
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ 
     error: 'Database error',
     remaining: attemptCheck.remaining
 });
                 }
 
-                return res.status(200).json({ 
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(200).json({ 
     success: true,
     action: 'updated',
     shortCode,
@@ -198,13 +205,15 @@ module.exports = async (req, res) => {
                     });
 
                 if (error) {
-                    return res.status(500).json({ 
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ 
     error: 'Database error',
     remaining: attemptCheck.remaining
 });
                 }
 
-                return res.status(201).json({ 
+                res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(201).json({ 
     success: true,
     action: 'created',
     shortCode,
@@ -213,10 +222,10 @@ module.exports = async (req, res) => {
             }
         }
 
-        return res.status(405).json({ error: 'Method not allowed' });
-
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
         console.error('API Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).json({ error: 'Internal server error' });    }
 };

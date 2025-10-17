@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
 
         if (!shortCode || shortCode.length < 3) {
             console.log('Invalid short code length');
-            return res.status(404).send('Short code invalid');
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(404).send('Short code invalid');
         }
 
         // البحث في قاعدة البيانات
@@ -28,14 +28,14 @@ module.exports = async (req, res) => {
 
         if (error) {
             console.log('Database error:', error);
-            return res.status(404).send('Link not found - ' + error.message);
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(404).send('Link not found - ' + error.message);
         }
 
         if (!link) {
             console.log('No link found for code:', shortCode);
-            return res.status(404).send('Link not found');
-
+            res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(404).send('Link not found');
         }
 
         console.log('Found link:', link);
@@ -53,10 +53,11 @@ module.exports = async (req, res) => {
         }
 
         // إعادة التوجيه
+        res.setHeader('Access-Control-Allow-Origin', '*');
         return res.redirect(301, link.destination_url);
 
     } catch (error) {
         console.error('Redirect function error:', error);
-        return res.status(500).send('Server error: ' + error.message);
-    }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+return res.status(500).send('Server error: ' + error.message);    }
 };
