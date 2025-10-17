@@ -637,7 +637,7 @@
 
             try {
                 // إرسال البيانات إلى API
-                const response = await fetch('/.netlify/functions/links', {
+                const response = await fetch('/api/links', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -701,7 +701,7 @@
         // تحميل عدد المحاولات المتبقية عند فتح الصفحة
         async function loadRemainingAttempts() {
             try {
-                const response = await fetch('/.netlify/functions/attempts', {
+                const response = await fetch('/api/attempts', {
                     method: 'GET'
                 });
                 

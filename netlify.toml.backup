@@ -4,14 +4,14 @@
 # إعادة توجيه الروابط المختصرة إلى API
 [[redirects]]
   from = "/:shortCode"
-  to = "/.netlify/functions/links/:shortCode"
+  to = "/api/links/:shortCode"
   status = 200
   conditions = {role = ["link"]}
 
 # إعادة توجيه API
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/api/:splat"
   status = 200
 
 # معالجة الروابط غير الموجودة

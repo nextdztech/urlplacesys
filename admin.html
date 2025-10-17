@@ -689,7 +689,7 @@ strong {
             loginBtnText.innerHTML = 'جاري التحقق... <span class="loading"></span>';
             
             try {
-                const response = await fetch('/.netlify/functions/admin-auth', {
+                const response = await fetch('/api/admin-auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
@@ -742,7 +742,7 @@ strong {
         // تحميل بيانات لوحة التحكم
         async function loadDashboardData() {
             try {
-                const response = await fetch('/.netlify/functions/admin-links');
+                const response = await fetch('/api/admin-links');
                 const result = await response.json();
                 
                 if (response.ok) {
@@ -852,8 +852,8 @@ strong {
             
             try {
                 const url = isEditMode ? 
-                    `/.netlify/functions/admin-links?id=${editingLinkId}` : 
-                    '/.netlify/functions/admin-links';
+                    `/api/admin-links?id=${editingLinkId}` : 
+                    '/api/admin-links';
                 
                 const response = await fetch(url, {
                     method: isEditMode ? 'PUT' : 'POST',
@@ -883,7 +883,7 @@ strong {
             if (!confirm('هل أنت متأكد من حذف هذا الرابط؟')) return;
             
             try {
-                const response = await fetch(`/.netlify/functions/admin-links?id=${linkId}`, {
+                const response = await fetch(`/api/admin-links?id=${linkId}`, {
                     method: 'DELETE'
                 });
                 
@@ -934,7 +934,7 @@ strong {
             if (!confirm('هل تريد حذف الروابط التي لم تستخدم لأكثر من 6 أشهر؟')) return;
             
             try {
-                const response = await fetch('/.netlify/functions/admin-cleanup', {
+                const response = await fetch('/api/admin-cleanup', {
                     method: 'POST'
                 });
                 
