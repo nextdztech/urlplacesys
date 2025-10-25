@@ -5,27 +5,22 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
-    };
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).end();    }
+        return res.status(200).end();
+    }
 
     if (req.method !== 'POST') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(405).json({ error: 'Method not allowed' });    }
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
     try {
-        // تاريخ 6 أشهر مضت
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-        // حذف الروابط القديمة التي لم تستخدم
         const { data: deletedLinks, error } = await supabase
             .from('links')
             .delete()
@@ -34,11 +29,9 @@ return res.status(405).json({ error: 'Method not allowed' });    }
             .select();
 
         if (error) {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(500).json({ error: 'Database error' });
+            return res.status(500).json({ error: 'Database error' });
         }
 
-        // تنظيف محاولات العملاء القديمة
         const oneDayAgo = new Date();
         oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
@@ -47,14 +40,13 @@ return res.status(500).json({ error: 'Database error' });
             .delete()
             .lt('reset_time', oneDayAgo.toISOString());
 
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).json({
-    success: true,
-    deletedCount: deletedLinks ? deletedLinks.length : 0
-});
+        return res.status(200).json({
+            success: true,
+            deletedCount: deletedLinks ? deletedLinks.length : 0
+        });
 
     } catch (error) {
         console.error('Cleanup API Error:', error);
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(500).json({ error: 'Internal server error' });    }
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 };

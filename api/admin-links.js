@@ -4,23 +4,19 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// التحقق من صحة الكود
 function validateCode(code) {
     const codeRegex = /^[a-zA-Z0-9]{3,25}$/;
     return codeRegex.test(code);
 }
 
 module.exports = async (req, res) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Content-Type': 'application/json'
-    };
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).end();    }
+        return res.status(200).end();
+    }
 
     try {
         const method = req.method;
@@ -34,10 +30,9 @@ return res.status(200).end();    }
                 .order('created_at', { ascending: false });
 
             if (linksError) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(500).json({ error: 'Database error' });            }
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-            // حساب الإحصائيات
             const now = new Date();
             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
@@ -48,39 +43,33 @@ return res.status(500).json({ error: 'Database error' });            }
                 activeLinks: links.filter(link => (link.visit_count || 0) > 0).length
             };
 
-            res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).json({ links, stats });
+            return res.status(200).json({ links, stats });
         }
 
         // POST: إنشاء رابط جديد
         if (method === 'POST') {
-            const { shortCode, destinationUrl } = JSON.parse(req.body);
+            const { shortCode, destinationUrl } = req.body;
 
-            // التحقق من البيانات
             if (!validateCode(shortCode)) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Invalid short code' });            }
+                return res.status(400).json({ error: 'Invalid short code' });
+            }
 
             try {
                 new URL(destinationUrl);
             } catch {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Invalid URL' });
+                return res.status(400).json({ error: 'Invalid URL' });
             }
 
-            // التحقق من وجود الكود
             const { data: existing } = await supabase
                 .from('links')
                 .select('id')
                 .eq('short_code', shortCode)
-                .single();
+                .limit(1);
 
-            if (existing) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Short code already exists' });
+            if (existing && existing.length > 0) {
+                return res.status(400).json({ error: 'Short code already exists' });
             }
 
-            // إنشاء الرابط
             const { error } = await supabase
                 .from('links')
                 .insert({
@@ -90,48 +79,41 @@ return res.status(400).json({ error: 'Short code already exists' });
                 });
 
             if (error) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(500).json({ error: 'Database error' });            }
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-            res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(201).json({ success: true });
+            return res.status(201).json({ success: true });
         }
 
         // PUT: تحديث رابط موجود
         if (method === 'PUT') {
             if (!id) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Link ID required' });
+                return res.status(400).json({ error: 'Link ID required' });
             }
 
-            const { shortCode, destinationUrl } = JSON.parse(req.body);
+            const { shortCode, destinationUrl } = req.body;
 
-            // التحقق من البيانات
             if (!validateCode(shortCode)) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Invalid short code' });            }
+                return res.status(400).json({ error: 'Invalid short code' });
+            }
 
             try {
                 new URL(destinationUrl);
             } catch {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Invalid URL' });
+                return res.status(400).json({ error: 'Invalid URL' });
             }
 
-            // التحقق من تفرد الكود (إلا إذا كان نفس الرابط)
             const { data: existing } = await supabase
                 .from('links')
                 .select('id')
                 .eq('short_code', shortCode)
                 .neq('id', id)
-                .single();
+                .limit(1);
 
-            if (existing) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Short code already exists' });
+            if (existing && existing.length > 0) {
+                return res.status(400).json({ error: 'Short code already exists' });
             }
 
-            // تحديث الرابط
             const { error } = await supabase
                 .from('links')
                 .update({
@@ -142,17 +124,16 @@ return res.status(400).json({ error: 'Short code already exists' });
                 .eq('id', id);
 
             if (error) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                return res.status(500).json({ error: 'Database error' });            }
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-            res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).json({ success: true });        }
+            return res.status(200).json({ success: true });
+        }
 
         // DELETE: حذف رابط
         if (method === 'DELETE') {
             if (!id) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(400).json({ error: 'Link ID required' });
+                return res.status(400).json({ error: 'Link ID required' });
             }
 
             const { error } = await supabase
@@ -161,16 +142,16 @@ return res.status(400).json({ error: 'Link ID required' });
                 .eq('id', id);
 
             if (error) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                return res.status(500).json({ error: 'Database error' });            }
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-            res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(200).json({ success: true });        }
+            return res.status(200).json({ success: true });
+        }
 
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(405).json({ error: 'Method not allowed' });
+        return res.status(405).json({ error: 'Method not allowed' });
+
     } catch (error) {
         console.error('Admin Links API Error:', error);
-        res.setHeader('Access-Control-Allow-Origin', '*');
-return res.status(500).json({ error: 'Internal server error' });    }
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 };
